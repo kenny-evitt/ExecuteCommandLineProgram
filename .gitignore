@@ -1,0 +1,8 @@
+[Bb]in/
+[Oo]bj/
+
+# Ignore user files
+*.user
+
+# Ignore Visual Studio user option files
+*.suo
