@@ -2,6 +2,9 @@
 
 ExecuteCommandLineProgram is a .NET (4.5) class library for executing command line programs.
 
+The code was copied and slightly modified from [this answer](http://stackoverflow.com/a/4587739/173497) 
+to the Stack Overflow question [How to capture Shell command output in C#?](http://stackoverflow.com/questions/4587415/how-to-capture-shell-command-output-in-c).
+
 Example usage:
 
 	CommandLineProgramProcessResult result =
