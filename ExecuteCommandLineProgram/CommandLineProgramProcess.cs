@@ -4,6 +4,7 @@ namespace ExecuteCommandLineProgram
 {
     using System;
     using System.Diagnostics;
+    using System.IO;
     using System.Text;
     using System.Threading;
 
@@ -33,19 +34,53 @@ namespace ExecuteCommandLineProgram
         /// </returns>
         public static CommandLineProgramProcessResult RunProgram(string command, string workingDirectory, string args, int timeout)
         {
+            return RunProgram(command, workingDirectory, args, timeout, null);
+        }
+
+        /// <summary>
+        /// Executes a command-line program, specifying a maximum time to wait
+        /// for it to complete.
+        /// </summary>
+        /// <param name="command">
+        /// The path to the program executable.
+        /// </param>
+        /// <param name="workingDirectory">
+        /// The path of the working directory for the process executing the program executable.
+        /// </param>
+        /// <param name="args">
+        /// The command-line arguments for the program.
+        /// </param>
+        /// <param name="timeout">
+        /// The maximum time to wait for the subprocess to complete, in milliseconds.
+        /// </param>
+        /// <param name="input">
+        /// Input to be sent via standard input.
+        /// </param>
+        /// <returns>
+        /// A <see cref="CommandLineProgramProcessResult"/> containing the results of
+        /// running the program.
+        /// </returns>
+        public static CommandLineProgramProcessResult RunProgram(string command, string workingDirectory, string args, int timeout, string input)
+        {
             bool timedOut = false;
             ProcessStartInfo pinfo = new ProcessStartInfo(command);
             pinfo.Arguments = args;
             pinfo.UseShellExecute = false;
             pinfo.CreateNoWindow = true;
             pinfo.WorkingDirectory = workingDirectory;
+            pinfo.RedirectStandardInput = true;
             pinfo.RedirectStandardOutput = true;
             pinfo.RedirectStandardError = true;
             Process process = Process.Start(pinfo);
             ProcessStream processStream = new ProcessStream();
+            StreamWriter inputStreamWriter = process.StandardInput;
 
             try
             {
+                if (!String.IsNullOrEmpty(input))
+                    inputStreamWriter.Write(input);
+
+                inputStreamWriter.Close();
                 processStream.Read(process);
                 process.WaitForExit(timeout);
                 processStream.Stop();
