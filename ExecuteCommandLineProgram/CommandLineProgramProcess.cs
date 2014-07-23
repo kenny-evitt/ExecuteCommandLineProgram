@@ -60,7 +60,13 @@ namespace ExecuteCommandLineProgram
         /// A <see cref="CommandLineProgramProcessResult"/> containing the results of
         /// running the program.
         /// </returns>
-        public static CommandLineProgramProcessResult RunProgram(string command, string workingDirectory, string args, int timeout, string input)
+        public static CommandLineProgramProcessResult RunProgram(
+            string command,
+            string workingDirectory,
+            string args,
+            int timeout,
+            string input,
+            Encoding inputEncoding = null)
         {
             bool timedOut = false;
             ProcessStartInfo pinfo = new ProcessStartInfo(command);
@@ -73,7 +79,18 @@ namespace ExecuteCommandLineProgram
             pinfo.RedirectStandardError = true;
             Process process = Process.Start(pinfo);
             ProcessStream processStream = new ProcessStream();
-            StreamWriter inputStreamWriter = process.StandardInput;
+
+            StreamWriter inputStreamWriter;
+
+            if (inputEncoding == null)
+            {
+                inputStreamWriter = process.StandardInput;
+            }
+            else
+            {
+                inputStreamWriter = new StreamWriter(process.StandardInput.BaseStream, inputEncoding);
+            }
+
             Encoding standardInputEncoding = inputStreamWriter.Encoding;
 
             try
