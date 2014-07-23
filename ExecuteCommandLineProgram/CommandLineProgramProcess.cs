@@ -74,6 +74,7 @@ namespace ExecuteCommandLineProgram
             Process process = Process.Start(pinfo);
             ProcessStream processStream = new ProcessStream();
             StreamWriter inputStreamWriter = process.StandardInput;
+            Encoding standardInputEncoding = inputStreamWriter.Encoding;
 
             try
             {
@@ -119,7 +120,8 @@ namespace ExecuteCommandLineProgram
                 processStream.StandardOutput.Trim(),
                 processStream.StandardError.Trim(),
                 process.ExitCode,
-                timedOut);
+                timedOut,
+                standardInputEncoding);
 
             return result;
         }
@@ -131,18 +133,20 @@ namespace ExecuteCommandLineProgram
     public class CommandLineProgramProcessResult
     {
         readonly float _executionTime;
+        private readonly Encoding _standardInputEncoding;
         readonly string _standardOutputString;
         readonly string _standardErrorString;
         readonly int _exitCode;
         readonly bool _hasTimedOut;
 
-        internal CommandLineProgramProcessResult(float executionTime, string stdout, string stderr, int exitCode, bool timedOut)
+        internal CommandLineProgramProcessResult(float executionTime, string stdout, string stderr, int exitCode, bool timedOut, Encoding standardInputEncoding)
         {
             this._executionTime = executionTime;
             this._standardOutputString = stdout;
             this._standardErrorString = stderr;
             this._exitCode = exitCode;
             this._hasTimedOut = timedOut;
+            _standardInputEncoding = standardInputEncoding;
         }
 
         /// <summary>
@@ -167,6 +171,11 @@ namespace ExecuteCommandLineProgram
         public string StandardError
         {
             get { return _standardErrorString; }
+        }
+
+        public Encoding StandardInputEncoding
+        {
+            get { return _standardInputEncoding; }
         }
 
         /// <summary>
